@@ -1,0 +1,40 @@
+<!-- ChatProject/chat/templates/chat/home.html -->
+{% extends 'chat/base.html' %}
+{% load static %}
+{% block title %}Home - ChatProject{% endblock %}
+
+{% block content %}
+  <div class="jumbotron">
+      <h1 class="display-4">Welcome to ChatProject!</h1>
+      {% if user.is_authenticated %}
+          <p class="lead">Hi, {{ user.username }}. Here are your recent chats:</p>
+          {% if conversations %}
+            <ul class="list-group">
+              {% for convo in conversations %}
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                  <div>
+                    <a href="{% url 'chat:chat' convo.friend.profile.individual_id %}">
+                      <strong>{{ convo.friend.username }}</strong>
+                    </a>
+                    {% if convo.latest_message %}
+                      <br>
+                      <small class="text-muted">
+                        {{ convo.latest_message.content|truncatewords:10 }}<br>
+                        <em>{{ convo.latest_message.timestamp|date:"M d, Y H:i" }}</em>
+                      </small>
+                    {% endif %}
+                  </div>
+                  {% if convo.unread_count > 0 %}
+                    <span class="badge bg-danger rounded-pill">{{ convo.unread_count }}</span>
+                  {% endif %}
+                </li>
+              {% endfor %}
+            </ul>
+          {% else %}
+            <p>You have no active chats yet.</p>
+          {% endif %}
+      {% else %}
+          <p class="lead">Please <a href="{% url 'chat:login' %}">login</a> or <a href="{% url 'chat:register' %}">register</a> to start chatting.</p>
+      {% endif %}
+  </div>
+{% endblock %}

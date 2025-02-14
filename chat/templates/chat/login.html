@@ -1,0 +1,12 @@
+<!-- ChatProject/chat/templates/chat/login.html -->
+{% extends 'chat/base.html' %}
+{% block title %}Login - ChatProject{% endblock %}
+{% block content %}
+  <h2>Login</h2>
+  <form method="post" class="mt-3">
+      {% csrf_token %}
+      {{ form.as_p }}
+      <button type="submit" class="btn btn-primary">Login</button>
+  </form>
+  <p class="mt-3">Don't have an account? <a href="{% url 'chat:register' %}">Register here</a>.</p>
+{% endblock %}
