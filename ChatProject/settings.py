@@ -9,6 +9,7 @@ DEBUG = True
 ALLOWED_HOSTS = []
 
 INSTALLED_APPS = [
+    'daphne',
     # Default apps...
     'django.contrib.admin',
     'django.contrib.auth',
