@@ -22,6 +22,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
     async def receive(self, text_data):
         data = json.loads(text_data)
         message_text = data.get('message')
+        attachment = data.get('attachment')
         sender_username = self.scope['user'].username
         # Save message to DB
         message_obj = await self.create_message(self.scope['user'], self.friend_id, message_text)

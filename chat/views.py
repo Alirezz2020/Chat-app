@@ -1,6 +1,5 @@
-# ChatProject/chat/views.py
-import json
 
+import json
 from django.views.generic import TemplateView, CreateView, FormView, ListView
 from django.contrib.auth.views import LoginView, LogoutView
 from django.contrib.auth import logout
@@ -18,7 +17,7 @@ from django.db.models import Q
 from django.contrib.auth.models import User
 from .models import *
 from django.contrib.auth.decorators import login_required
-# Home view: shows welcome message and recent chats if logged in.
+from django.core.files.storage import default_storage
 class HomeView(TemplateView):
     template_name = 'chat/home.html'
 
@@ -47,31 +46,16 @@ class HomeView(TemplateView):
                                    reverse=True)
             context['conversations'] = conversation_data
         return context
-
-
-# Login view using Django's built-in view.
 class UserLoginView(LoginView):
     template_name = 'chat/login.html'
-
-
-
-
-
 class CustomLogoutView(View):
     def get(self, request):
         logout(request)
         return redirect('chat:dashboard')
-
-
-
-# Registration view.
 class RegisterView(CreateView):
     form_class = UserRegistrationForm
     template_name = 'chat/register.html'
     success_url = reverse_lazy('chat:profile_edit')
-
-
-# Profile edit view.
 class ProfileEditView(LoginRequiredMixin, FormView):
     template_name = 'chat/profile_edit.html'
     form_class = ProfileForm
@@ -87,9 +71,6 @@ class ProfileEditView(LoginRequiredMixin, FormView):
     def form_valid(self, form):
         form.save()
         return super().form_valid(form)
-
-
-# User search view.
 class SearchUserView(LoginRequiredMixin, ListView):
     template_name = 'chat/search.html'
     context_object_name = 'users'
@@ -101,7 +82,6 @@ class SearchUserView(LoginRequiredMixin, ListView):
         if query:
             return User.objects.filter(profile__individual_id__icontains=query)
         return User.objects.none()
-
 @csrf_exempt
 def edit_message(request, message_id):
     if request.method == "POST" and request.user.is_authenticated:
@@ -112,7 +92,6 @@ def edit_message(request, message_id):
             message.edit_message(new_content)
         return JsonResponse({"success": True})
     return JsonResponse({"error": "Invalid request"}, status=400)
-
 @csrf_exempt
 def delete_message(request, message_id):
     if request.method == "POST" and request.user.is_authenticated:
@@ -120,9 +99,6 @@ def delete_message(request, message_id):
         message.delete_message()
         return JsonResponse({"success": True})
     return JsonResponse({"error": "Invalid request"}, status=400)
-
-
-# Chat conversation view.
 class ChatView(LoginRequiredMixin, TemplateView):
     template_name = 'chat/chat.html'
     login_url = 'chat:login'
@@ -143,13 +119,9 @@ class ChatView(LoginRequiredMixin, TemplateView):
         ).order_by('-timestamp')[:20]
         context['messages'] = list(reversed(msgs))
         return context
-
-
 # Helper function to create system messages
 def create_system_message(group, content):
     Message.objects.create(sender=None, group=group, content=content)
-
-# Create Group View – Group creator sets a unique id, name, image, bio, etc.
 class CreateGroupView(LoginRequiredMixin, CreateView):
     model = GroupChat
     form_class = GroupChatForm
@@ -163,9 +135,7 @@ class CreateGroupView(LoginRequiredMixin, CreateView):
         GroupMembership.objects.create(user=self.request.user, group=group)
         create_system_message(group, f"{self.request.user.username} joined {group.group_name}")
         return super().form_valid(form)
-
 @login_required
-
 def group_search(request):
     query = request.GET.get('q', '')
     search_results = None
@@ -179,8 +149,6 @@ def group_search(request):
         'joined_groups': joined_groups,
         'query': query
     })
-
-
 @login_required
 def join_group(request, group_id):
     group = get_object_or_404(GroupChat, group_id=group_id)
@@ -199,8 +167,6 @@ def leave_group(request, group_id):
             # Create a system message for leave:
             Message.objects.create(sender=None, group=group, content=f"{request.user.username} left {group.group_name}")
     return redirect('chat:dashboard')
-
-# Group Edit View – only group owner can update group info
 class GroupEditView(LoginRequiredMixin, UpdateView):
     model = GroupChat
     form_class = GroupChatForm
@@ -212,7 +178,6 @@ class GroupEditView(LoginRequiredMixin, UpdateView):
         if self.request.user != group.owner:
             raise PermissionError("Only the group owner can edit group info.")
         return group
-
 @login_required
 def delete_group(request, group_id):
     group = get_object_or_404(GroupChat, group_id=group_id)
@@ -221,12 +186,6 @@ def delete_group(request, group_id):
         return redirect('chat:dashboard')
     else:
         return JsonResponse({"error": "Only the group owner can delete this group."}, status=403)
-
-
-
-
-
-# DashboardView: shows one-to-one chat list and groups for the logged-in user.
 class DashboardView(LoginRequiredMixin, TemplateView):
     template_name = 'chat/dashboard.html'
     login_url = 'chat:login'
@@ -258,9 +217,6 @@ class DashboardView(LoginRequiredMixin, TemplateView):
         # Groups the user belongs to:
         context['groups'] = user.group_chats.all()
         return context
-
-
-# ProfilePageView: displays a user's profile.
 class ProfilePageView(LoginRequiredMixin, TemplateView):
     template_name = 'chat/profile.html'
     login_url = 'chat:login'
@@ -271,9 +227,6 @@ class ProfilePageView(LoginRequiredMixin, TemplateView):
         profile_user = get_object_or_404(User, username=username)
         context['profile_user'] = profile_user
         return context
-
-
-# GroupChatView: shows the messages and members for a group.
 class GroupChatView(LoginRequiredMixin, TemplateView):
     template_name = 'chat/group_chat.html'
     login_url = 'chat:login'
@@ -300,8 +253,6 @@ class GroupChatView(LoginRequiredMixin, TemplateView):
         memberships = {gm.user.id: gm.joined_at for gm in group.groupmembership_set.all()}
         context['memberships'] = memberships
         return context
-
-
 class GroupInfoView(LoginRequiredMixin, TemplateView):
     template_name = 'chat/group_info.html'
     login_url = 'chat:login'

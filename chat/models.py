@@ -53,7 +53,7 @@ class Message(models.Model):
     receiver = models.ForeignKey(User, null=True, blank=True, on_delete=models.CASCADE, related_name='received_messages')
     group = models.ForeignKey(GroupChat, null=True, blank=True, on_delete=models.CASCADE)
     content = models.TextField(blank=True)
-    attachment = models.FileField(upload_to='message_attachments/', null=True, blank=True)
+    attachment = models.URLField(null=True, blank=True)
     timestamp = models.DateTimeField(auto_now_add=True)
     status = models.CharField(max_length=10, choices=MESSAGE_STATUS, default='sent')
     edited_at = models.DateTimeField(null=True, blank=True)

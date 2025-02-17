@@ -28,4 +28,6 @@ urlpatterns = [
     path('group_info/<str:group_id>/', views.GroupInfoView.as_view(), name='group_info'),
 
 
+
+
 ]

@@ -1,0 +1,62 @@
+
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyo
+
+# Distribution / packaging
+build/
+dist/
+*.egg-info/
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Environments
+.env
+venv/
+ENV/
+.venv/
+env.bak/
+venv.bak/
+
+# Django stuff
+*.sqlite3
+db.sqlite3
+media/
+staticfiles/
+
+# VS Code
+.vscode/
+
+# Byte-compiled / optimized / DLL files
+*.so
+*.dylib
+*.dll
+
+# Mac OS
+.DS_Store
+.DS_Store?
+
+# Logs
+*.log
+
+# Coverage reports
+htmlcov/
+.coverage
+.coverage.*
+.cache
+coverage.xml
+
+# Mypy
+.mypy_cache/
+
+# Pytest
+.pytest_cache/
+
+# Sphinx
+docs/_build/
+
+# Node modules (if using any frontend tooling)
+node_modules/
