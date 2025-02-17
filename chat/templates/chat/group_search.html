@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Search Groups - ChatProject{% endblock %}
+{% block content %}
+<h2>Search Groups</h2>
+<form method="get">
+  <input type="text" name="q" placeholder="Search groups by ID or name" value="{{ query }}" required>
+  <button type="submit" class="btn btn-primary">Search</button>
+</form>
+
+<div class="mt-3">
+  <a href="{% url 'chat:create_group' %}" class="btn btn-success">Create Group</a>
+</div>
+
+{% if query %}
+  <h3 class="mt-3">Search Results for "{{ query }}":</h3>
+  <ul class="list-group">
+    {% for group in search_results %}
+      <li class="list-group-item">
+        <a href="{% url 'chat:group_chat' group.group_id %}">{{ group.group_name }}</a>
+        <br>
+        <small>Group ID: {{ group.group_id }}</small>
+      </li>
+    {% empty %}
+      <p>No groups found matching "{{ query }}".</p>
+    {% endfor %}
+  </ul>
+{% endif %}
+
+<h3 class="mt-3">All Groups You've Joined:</h3>
+<ul class="list-group">
+  {% for group in joined_groups %}
+    <li class="list-group-item">
+      <a href="{% url 'chat:group_chat' group.group_id %}">{{ group.group_name }}</a>
+      <br>
+      <small>Group ID: {{ group.group_id }}</small>
+    </li>
+  {% empty %}
+    <p>You haven't joined any groups yet.</p>
+  {% endfor %}
+</ul>
+{% endblock %}

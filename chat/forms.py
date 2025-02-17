@@ -2,7 +2,7 @@
 from django import forms
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
-from .models import Profile
+from .models import *
 
 
 class UserRegistrationForm(forms.ModelForm):
@@ -36,8 +36,6 @@ class UserRegistrationForm(forms.ModelForm):
         if commit:
             user.save()
         return user
-
-
 class ProfileForm(forms.ModelForm):
     class Meta:
         model = Profile
@@ -55,3 +53,18 @@ class ProfileForm(forms.ModelForm):
         if qs.exists():
             raise ValidationError("This Individual ID is already taken.")
         return individual_id
+class GroupChatForm(forms.ModelForm):
+    class Meta:
+        model = GroupChat
+        fields = ['group_id', 'group_name', 'bio', 'image']
+        widgets = {
+            'group_id': forms.TextInput(attrs={'placeholder': 'Unique Group ID (no spaces)'}),
+            'group_name': forms.TextInput(attrs={'placeholder': 'Group Name'}),
+            'bio': forms.Textarea(attrs={'placeholder': 'Group bio (optional)', 'rows': 3}),
+        }
+
+    def clean_group_id(self):
+        group_id = self.cleaned_data.get('group_id')
+        if " " in group_id:
+            raise forms.ValidationError("Group ID cannot contain spaces.")
+        return group_id

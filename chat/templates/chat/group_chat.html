@@ -1,0 +1,99 @@
+{% extends 'base.html' %}
+{% load dict_extras static %}
+{% block title %}Group Chat: {{ group.group_name }} - ChatProject{% endblock %}
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/chat.css' %}">
+{% endblock %}
+{% block content %}
+<h2>Group Chat: <a href="{% url 'chat:group_info' group.group_id %}">{{ group.group_name }}</a></h2>
+<div class="group-actions mb-3">
+  {% if user == group.owner %}
+    <a href="{% url 'chat:edit_group' group.group_id %}" class="btn btn-warning">Edit Group</a>
+    <a href="{% url 'chat:delete_group' group.group_id %}" class="btn btn-danger">Delete Group</a>
+  {% elif user in group.members.all %}
+    <a href="{% url 'chat:leave_group' group.group_id %}" class="btn btn-secondary">Leave Group</a>
+  {% endif %}
+  <button id="members-btn" class="btn btn-info">Members</button>
+</div>
+<div id="members-list" style="display:none;">
+  <ul class="list-group">
+    {% for member in group.members.all %}
+      <li class="list-group-item">
+        <a href="{% url 'chat:profile_page' member.username %}">{{ member.username }}</a>
+        {% if memberships|get_item:member.id %}
+          <small>Joined {{ memberships|get_item:member.id|timesince }} ago</small>
+        {% endif %}
+      </li>
+    {% endfor %}
+  </ul>
+</div>
+<div id="chat-log" class="chat-container" data-group-id="{{ group.group_id }}" data-username="{{ request.user.username }}">
+  {% for msg in messages %}
+    <div class="message {% if msg.sender == request.user %}own{% else %}other{% endif %}">
+      <div class="message-header">
+        {% if msg.sender %}
+          {% if msg.sender == request.user %}
+            <div class="message-info own-info">
+              <a href="{% url 'chat:profile_page' msg.sender.username %}" class="username">YOU</a>
+              <img src="{% if msg.sender.profile.image %}{{ msg.sender.profile.image.url }}{% else %}{% static 'img/default.png' %}{% endif %}" class="profile-thumb">
+            </div>
+          {% else %}
+            <div class="message-info other-info">
+              <img src="{% if msg.sender.profile.image %}{{ msg.sender.profile.image.url }}{% else %}{% static 'img/default.png' %}{% endif %}" class="profile-thumb">
+              <a href="{% url 'chat:profile_page' msg.sender.username %}" class="username">{{ msg.sender.username }}</a>
+            </div>
+          {% endif %}
+        {% else %}
+          <div class="message-info system-info">
+            <em>System</em>
+          </div>
+        {% endif %}
+      </div>
+      <div class="message-body">
+        {% if msg.deleted %}
+          <em>This message has been deleted</em>
+        {% else %}
+          <p>{{ msg.content }}</p>
+          {% if msg.attachment %}
+            <div class="attachment">
+              {% if msg.attachment.url|lower|slice:"-4:" == ".mp4" %}
+                <video controls src="{{ msg.attachment.url }}"></video>
+              {% elif msg.attachment.url|lower|slice:"-4:" == ".mp3" %}
+                <audio controls src="{{ msg.attachment.url }}"></audio>
+              {% else %}
+                <img src="{{ msg.attachment.url }}" alt="attachment">
+              {% endif %}
+            </div>
+          {% endif %}
+          {% if msg.edited_at %}
+            <small>(edited)</small>
+          {% endif %}
+        {% endif %}
+      </div>
+      <div class="message-meta">
+        <span class="timestamp">{{ msg.timestamp|date:"M d, Y H:i" }}</span>
+      </div>
+      <div class="message-status">
+        {% if msg.sender == request.user and not msg.deleted %}
+          <button class="edit-btn" data-message-id="{{ msg.id }}">Edit</button>
+          <button class="delete-btn" data-message-id="{{ msg.id }}">Delete</button>
+        {% endif %}
+      </div>
+    </div>
+  {% endfor %}
+</div>
+<div class="input-group mt-3">
+  <input id="chat-message-input" type="text" class="form-control" placeholder="Type your message...">
+  <input id="chat-message-attachment" type="file" class="form-control">
+  <button id="chat-message-send" class="btn btn-primary">Send</button>
+</div>
+{% endblock %}
+{% block extra_js %}
+<script src="{% static 'js/group_chat.js' %}"></script>
+<script>
+  document.getElementById("members-btn").addEventListener("click", function(){
+    const membersList = document.getElementById("members-list");
+    membersList.style.display = (membersList.style.display === "none") ? "block" : "none";
+  });
+</script>
+{% endblock %}

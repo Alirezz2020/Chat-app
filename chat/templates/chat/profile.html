@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Profile of {{ profile_user.username }} - ChatProject{% endblock %}
+{% block content %}
+<div class="profile-container">
+  <div class="profile-header">
+    <img src="{% if profile_user.profile.image %}{{ profile_user.profile.image.url }}{% else %}{% static 'img/default.png' %}{% endif %}" class="profile-picture">
+    <div class="profile-details">
+      <h2>{{ profile_user.username }}</h2>
+      <p><strong>Name:</strong> {{ profile_user.first_name }} {{ profile_user.last_name }}</p>
+      <p><strong>Bio:</strong> {{ profile_user.profile.bio }}</p>
+      <p><strong>Individual ID:</strong> {{ profile_user.profile.individual_id }}</p>
+    </div>
+  </div>
+  {% if request.user == profile_user %}
+  <div class="profile-actions">
+    <a href="{% url 'chat:profile_edit' %}" class="btn btn-secondary">Edit Profile</a>
+  </div>
+  {% endif %}
+
+</div>
+{% endblock %}

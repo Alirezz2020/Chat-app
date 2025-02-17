@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+{% load dict_extras static %}
+{% block title %}Group Info - {{ group.group_name }}{% endblock %}
+{% block content %}
+<div class="group-info-container">
+  <h2>{{ group.group_name }}</h2>
+  {% if group.image %}
+    <img src="{{ group.image.url }}" alt="{{ group.group_name }}" class="group-image">
+  {% endif %}
+  <p><strong>Bio:</strong> {{ group.bio }}</p>
+  <p><strong>Created on:</strong> {{ group.created_at|date:"M d, Y" }}</p>
+
+  {% if user == group.owner %}
+    <!-- Only the group owner sees the unique invite link -->
+    <div class="invite-link">
+      <label for="group-link"><strong>Invite Link:</strong></label>
+      <input type="text" id="group-link" value="{{ request.build_absolute_uri }}" readonly>
+      <button onclick="copyGroupLink()" class="btn btn-secondary btn-sm">Copy Link</button>
+    </div>
+  {% endif %}
+
+  <h3>Members</h3>
+  <ul class="list-group">
+    {% for member in members %}
+      <li class="list-group-item">
+        <a href="{% url 'chat:profile_page' member.username %}">{{ member.username }}</a>
+        {% if memberships|get_item:member.id %}
+          <small>Joined {{ memberships|get_item:member.id|timesince }} ago</small>
+        {% endif %}
+      </li>
+    {% empty %}
+      <p>No members found.</p>
+    {% endfor %}
+  </ul>
+</div>
+
+<script>
+  function copyGroupLink() {
+    var link = document.getElementById("group-link");
+    link.select();
+    document.execCommand("copy");
+    alert("Group link copied!");
+  }
+</script>
+{% endblock %}

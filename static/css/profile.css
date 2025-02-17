@@ -1,0 +1,27 @@
+/* profile.css - Styles for Profile Pages */
+.profile-container {
+    max-width: 600px;
+    margin: 20px auto;
+    background-color: #333;
+    padding: 20px;
+    border-radius: 10px;
+    color: #eee;
+}
+.profile-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+}
+.profile-picture {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-right: 20px;
+}
+.profile-details p {
+    margin: 5px 0;
+}
+.profile-actions {
+    margin-top: 20px;
+}

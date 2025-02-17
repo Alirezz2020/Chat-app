@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Dashboard - ChatProject{% endblock %}
+{% block content %}
+<h2>Welcome, {{ user.username }}!</h2>
+<div class="dashboard">
+  <div class="section">
+    <h3>Your Chats</h3>
+    {% if conversations %}
+      <ul class="list-group">
+        {% for convo in conversations %}
+          <li class="list-group-item">
+            <a href="{% url 'chat:chat' convo.friend.profile.individual_id %}">{{ convo.friend.username }}</a>
+            {% if convo.unread_count > 0 %}
+              <span class="badge">{{ convo.unread_count }}</span>
+            {% endif %}
+          </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p>No chats yet.</p>
+    {% endif %}
+  </div>
+  <div class="section">
+    <h3>Your Groups</h3>
+    {% if groups %}
+      <ul class="list-group">
+        {% for group in groups %}
+          <li class="list-group-item">
+            <a href="{% url 'chat:group_chat' group.group_id %}">{{ group.group_name }}</a>
+          </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p>You are not in any groups.</p>
+    {% endif %}
+    <a class="btn btn-success" href="{% url 'chat:create_group' %}">Create Group</a>
+  </div>
+</div>
+{% endblock %}

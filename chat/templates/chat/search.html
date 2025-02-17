@@ -1,12 +1,12 @@
 <!-- ChatProject/chat/templates/chat/search.html -->
-{% extends 'chat/base.html' %}
+{% extends 'base.html' %}
 {% load static %}
 {% block title %}Search Users - ChatProject{% endblock %}
 {% block content %}
   <h2>Search Users</h2>
   <form method="get" class="mt-3 mb-3">
       <div class="input-group">
-          <input type="text" name="q" class="form-control" placeholder="Enter individual ID" value="{{ request.GET.q }}">
+          <input type="text" name="q" class="form-control" placeholder="Enter  ID" value="{{ request.GET.q }}">
           <button class="btn btn-outline-secondary" type="submit">Search</button>
       </div>
   </form>
